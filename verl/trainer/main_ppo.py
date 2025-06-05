@@ -23,6 +23,7 @@ import ray
 from verl.trainer.ppo.ray_trainer import RayPPOTrainer
 from verl.trainer.ppo.reward import load_reward_manager
 
+
 def get_custom_reward_fn(config):
     import importlib.util
     import sys
@@ -172,6 +173,7 @@ class TaskRunner:
         train_dataset = create_rl_dataset(config.data.train_files, config.data, tokenizer, processor)
         val_dataset = create_rl_dataset(config.data.val_files, config.data, tokenizer, processor)
         train_sampler = create_rl_sampler(config.data, train_dataset)
+
         trainer = RayPPOTrainer(
             config=config,
             tokenizer=tokenizer,

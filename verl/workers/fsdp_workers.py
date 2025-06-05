@@ -483,6 +483,7 @@ class ActorRolloutRefWorker(Worker):
                     offload_param=self._is_offload_param,
                 )
                 log_gpu_memory_usage("After building sharding manager", logger=logger)
+
             elif self.config.rollout.mode == "async":
                 from verl.workers.rollout.sglang_rollout import AsyncSGLangRollout
                 from verl.workers.sharding_manager.fsdp_sglang import FSDPAsyncSGLangShardingManager
