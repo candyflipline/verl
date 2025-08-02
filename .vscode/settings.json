@@ -1,15 +1,32 @@
 {
+    // --- General Python ---
+    "python.analysis.typeCheckingMode": "strict", // Matches pyright setting. Change to "strict" if needed based on pyproject.toml
+    "python.languageServer": "Pylance",         // Ensure Pylance is used
+  
+    // --- Ruff Integration ---
+    // 1. Enable format on save
+    "editor.formatOnSave": true,
+  
+    // 2. Set Ruff as the default formatter for Python files
+    "editor.defaultFormatter": "charliermarsh.ruff",
     "[python]": {
-        "editor.defaultFormatter": "charliermarsh.ruff",
-        "editor.codeActionsOnSave": {
-            "source.organizeImports": "always",
-        }
+        "editor.defaultFormatter": "charliermarsh.ruff"
     },
-    "files.associations": {
-        "array": "cpp",
-        "string_view": "cpp",
-        "initializer_list": "cpp",
-        "utility": "cpp"
+  
+  
+    "editor.codeActionsOnSave": {
+        "source.organizeImports": "explicit"
     },
-    "iis.configDir": ""
-}
+  
+  
+    // --- MyPy Integration (Optional) ---
+    // "python.linting.mypyEnabled": true,
+    // "python.linting.enabled": true,
+  
+    // --- Testing ---
+    "python.testing.pytestArgs": [
+        "tests"                   // Directory where tests are located
+    ],
+    "python.testing.unittestEnabled": false, // Disable unittest discovery if using pytest
+    "python.testing.pytestEnabled": true    // Enable pytest discovery
+  }

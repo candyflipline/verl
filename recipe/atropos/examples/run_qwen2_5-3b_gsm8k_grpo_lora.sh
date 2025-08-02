@@ -16,6 +16,10 @@ atropos_starting_step=0
 atropos_num_steps=10
 
 # -- VeRL Config --
+data_max_prompt_length=512
+data_max_response_length=512
+data_train_batch_size=1024
+
 # Algorithm
 adv_estimator=grpo
 use_kl_in_reward=False
@@ -66,6 +70,9 @@ total_epochs=15
 
 
 python3 -m recipe.atropos.main_atropos \
+    data.max_prompt_length=${data_max_prompt_length} \
+    data.max_response_length=${data_max_response_length} \
+    data.train_batch_size=${data_train_batch_size} \
     atropos.enable=${atropos_enable} \
     atropos.atropos_host=${atropos_host} \
     atropos.wandb_group=${atropos_wandb_group} \

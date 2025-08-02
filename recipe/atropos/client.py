@@ -7,11 +7,13 @@ import requests
 from omegaconf import DictConfig
 from transformers.tokenization_utils_base import PreTrainedTokenizerBase
 
-from recipe.atropos.exceptions import (AtroposAPIException,
-                                       AtroposNoDataFetchException)
-from recipe.atropos.schemas import (AtroposConfig, AtroposRegisterPayload,
-                                    AtroposRegisterResponse,
-                                    AtroposScoredDataBatch)
+from recipe.atropos.exceptions import AtroposAPIException, AtroposNoDataFetchException
+from recipe.atropos.schemas import (
+    AtroposConfig,
+    AtroposRegisterPayload,
+    AtroposRegisterResponse,
+    AtroposScoredDataBatch,
+)
 
 logger = logging.getLogger(__file__)
 logger.setLevel(os.getenv("VERL_LOGGING_LEVEL", "WARN"))
@@ -105,9 +107,6 @@ class AtroposClient:
                 raise AtroposAPIException(f"Failed to fetch batch from Atropos API: {e}") from e
 
         logger.error("Failed to fetch batch from Atropos API after all attempts.")
-        raise AtroposNoDataFetchException(f"Failed to fetch batch from Atropos API after {self.MAX_BACKOFF_ATTEMPTS} attempts.")
-                logger.error(f"Failed to fetch batch from Atropos API: {e}")
-                raise AtroposAPIException(f"Failed to fetch batch from Atropos API: {e}") from e
-
-        logger.error("Failed to fetch batch from Atropos API after all attempts.")
-        raise AtroposNoDataFetchException(f"Failed to fetch batch from Atropos API after {self.MAX_BACKOFF_ATTEMPTS} attempts.")
+        raise AtroposNoDataFetchException(
+            f"Failed to fetch batch from Atropos API after {self.MAX_BACKOFF_ATTEMPTS} attempts."
+        )

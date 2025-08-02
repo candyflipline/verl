@@ -104,7 +104,7 @@ class RayAtroposTrainer(RayPPOTrainer):
         resource_pool_manager: ResourcePoolManager,
         ray_worker_group_cls: Type[RayWorkerGroup] = RayWorkerGroup,
         reward_fn: Optional[
-            Union[BatchRewardManager, DAPORewardManager, NaiveRewardManager, PrimeRewardManager]
+            Union["BatchRewardManager", "DAPORewardManager", "NaiveRewardManager", "PrimeRewardManager"]
         ] = None,
         device_name: DeviceNameTypes = DeviceNameTypes.CUDA,
     ):
@@ -319,6 +319,8 @@ class RayAtroposTrainer(RayPPOTrainer):
         self.current_step = 0
         self.global_steps = 1  # we start from step 1
 
+        self._load_checkpoint()
+
         progress_bar = tqdm(
             total=cast(int, self.total_training_steps),
             initial=self.current_step,
@@ -474,6 +476,12 @@ class RayAtroposTrainer(RayPPOTrainer):
                         actor_output = self.actor_rollout_wg.update_actor(batch)
                         actor_output = cast(DataProto, actor_output)
 
+                    # --- Save Checkpoint ---
+                    save_freq = self.config.trainer.save_freq
+                    is_save_time = self.global_steps % save_freq == 0
+                    if save_freq > 0 and (is_last_step or is_save_time):
+                        self._save_checkpoint()
+
                     # Update metrics
                     actor_metrics = actor_output.meta_info.get("metrics", {})
                     actor_metrics = cast(Dict[str, Any], actor_metrics)
@@ -509,6 +517,4 @@ class RayAtroposTrainer(RayPPOTrainer):
             self.current_step += 1
 
         progress_bar.close()
-        print(f"Training completed. Final global step: {self.current_step}")
-        progress_bar.close()
-        print(f"Training completed. Final global step: {self.current_step}")
+        local_logger.info(f"Training completed. Final global step: {self.current_step}")

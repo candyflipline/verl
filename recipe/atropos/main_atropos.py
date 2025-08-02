@@ -34,11 +34,15 @@ logger.setLevel(os.getenv("VERL_LOGGING_LEVEL", "WARN"))
 
 
 @hydra.main(config_path="config", config_name="atropos_trainer", version_base=None)
-def main(config: DictConfig):
+def main(config: DictConfig) -> None:
+    assert isinstance(config, DictConfig)
+
     run_ppo(config)
 
 
 def run_ppo(config: DictConfig) -> None:
+    assert isinstance(config, DictConfig)
+
     if not ray.is_initialized():
         # this is for local ray cluster
         ray.init(

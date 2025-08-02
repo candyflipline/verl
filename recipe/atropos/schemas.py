@@ -4,7 +4,7 @@ from typing import Any, Dict, List, Literal, Optional, Union
 
 import numpy as np
 import torch
-from pydantic import BaseModel, Field, HttpUrl
+from pydantic import BaseModel, ConfigDict, Field, HttpUrl
 
 from verl.protocol import DataProto
 
@@ -27,7 +27,11 @@ class Message(BaseModel):
     reward: Optional[float]
 
 
-class AtroposScoredData(BaseModel):
+class AtroposBaseModel(BaseModel):
+    model_config = ConfigDict(arbitrary_types_allowed=True)
+
+
+class AtroposScoredData(AtroposBaseModel):
     # Required fields
     tokens: List[List[int]]
     masks: List[List[int]]
@@ -41,8 +45,10 @@ class AtroposScoredData(BaseModel):
     group_overrides: Optional[Dict[str, Any]] = None  # Group logging overrides
     images: Optional[Any] = None  # Image data (if applicable)
 
+    model_config = ConfigDict(arbitrary_types_allowed=True)
 
-class AtroposScoredDataProcessed(BaseModel):
+
+class AtroposScoredDataProcessed(AtroposBaseModel):
     """
     Contains fields for training.
     """
@@ -53,23 +59,25 @@ class AtroposScoredDataProcessed(BaseModel):
     attention_mask: torch.Tensor
     position_ids: torch.Tensor
 
+    model_config = ConfigDict(arbitrary_types_allowed=True)
+
     def convert_to_data_proto(self) -> DataProto:
         return DataProto.from_single_dict(self.model_dump())
 
 
-class AtroposRegisterPayload(BaseModel):
+class AtroposRegisterPayload(AtroposBaseModel):
     """
     Pydantic model to validate the config values and pass the payload to the register endpoint.
     """
 
     wandb_group: str = Field(default="default", description="WandB group name")
     wandb_project: str = Field(default="default", description="WandB project name")
-    batch_size: int = Field(..., gt=0, description="Batch size")
-    max_token_len: int = Field(..., gt=0, description="Max token length expected in trajectories")
-    checkpoint_dir: str = Field(..., description="Shared location for checkpoints")
-    save_checkpoint_interval: int = Field(..., gt=0, description="Save checkpoint interval")
-    starting_step: int = Field(..., gt=0, description="Starting step")
-    num_steps: int = Field(..., gt=0, description="Total expected training steps")
+    batch_size: int = Field(gt=0, description="Batch size")
+    max_token_len: int = Field(gt=0, description="Max token length expected in trajectories")
+    checkpoint_dir: str = Field(description="Shared location for checkpoints")
+    save_checkpoint_interval: int = Field(gt=0, description="Save checkpoint interval")
+    starting_step: int = Field(gt=0, description="Starting step")
+    num_steps: int = Field(gt=0, description="Total expected training steps")
 
     @classmethod
     def from_atropos_config(cls, atropos_cfg: "AtroposConfig") -> "AtroposRegisterPayload":
@@ -90,7 +98,7 @@ class AtroposConfig(AtroposRegisterPayload):
     Pydantic model to validate the config values and pass the payload to the register endpoint.
     """
 
-    atropos_host: HttpUrl = Field(default="http://localhost:8000", description="Atropos host")
+    atropos_host: HttpUrl = Field(default=HttpUrl("http://localhost:8000"), description="Atropos host")
 
 
 class AtroposRegisterResponse(BaseModel):
@@ -98,10 +106,10 @@ class AtroposRegisterResponse(BaseModel):
     Expected response from the register endpoint.
     """
 
-    uuid: str = Field(..., description="UUID of the registered trainer")
+    uuid: str = Field(description="UUID of the registered trainer")
 
 
-class AtroposScoredDataBatch(BaseModel):
+class AtroposScoredDataBatch(AtroposBaseModel):
     """
     This class handles:
 
